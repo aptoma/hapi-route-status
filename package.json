@@ -1,7 +1,7 @@
 {
   "name": "@aptoma/hapi-route-status",
   "author": "Martin Jonsson <martin@aptoma.com>",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Hapi Route Status",
   "main": "index.js",
   "repository": {
