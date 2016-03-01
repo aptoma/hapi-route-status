@@ -4,6 +4,7 @@ var fs = require('fs');
 
 exports.register = function (plugin, options, next) {
 	var data = {version: options.version};
+	options.pre = options.pre || [];
 
 	if (!options.revisionFile) {
 		return done(data);
@@ -33,6 +34,7 @@ exports.register = function (plugin, options, next) {
 				handler: function (req, reply) {
 					reply(data);
 				},
+				pre: options.pre,
 				description: 'Show status',
 				tags: ['api']
 			}
