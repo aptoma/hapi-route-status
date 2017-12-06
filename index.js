@@ -1,49 +1,48 @@
 'use strict';
+const promisify = require('util').promisify;
+const fs = require('fs');
+const readFile = promisify(fs.readFile);
 
-var fs = require('fs');
+module.exports = {
+	name: 'route-status',
+	async register(server, options) {
+		const data = {version: options.version};
+		options.pre = options.pre || [];
 
-exports.register = function (plugin, options, next) {
-	var data = {version: options.version};
-	options.pre = options.pre || [];
-
-	if (!options.revisionFile) {
-		return done(data);
-	}
-
-	fs.exists(options.revisionFile, function (exists) {
-		if (!exists) {
+		if (!options.revisionFile) {
 			return done(data);
 		}
 
-		fs.readFile(options.revisionFile, {encoding: 'utf-8'}, function (err, rev) {
-			if (err) {
-				return next(err);
-			}
+		const ex = await exists(options.revisionFile);
+		if (!ex) {
+			return done(data);
+		}
 
-			data.revision = rev.trim();
-			done(data);
-		});
-	});
+		const rev = await readFile(options.revisionFile, {encoding: 'utf-8'});
+		data.revision = rev.trim();
 
-	function done(data) {
-		plugin.route({
-			method: 'GET',
-			path: '/status',
-			config: {
-				auth: false,
-				handler: function (req, reply) {
-					reply(data);
-				},
-				pre: options.pre,
-				description: 'Show status',
-				tags: ['api']
-			}
-		});
+		return done(data);
 
-		next();
+		function done(data) {
+			server.route({
+				method: 'GET',
+				path: '/status',
+				config: {
+					auth: false,
+					handler() {
+						return data;
+					},
+					pre: options.pre,
+					description: 'Show status',
+					tags: ['api']
+				}
+			});
+		}
 	}
 };
 
-exports.register.attributes = {
-	name: 'route-status'
-};
+const exists = (path) => new Promise((resolve) => {
+	fs.exists(path, (exists) => {
+		resolve(exists);
+	});
+});
