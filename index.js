@@ -9,6 +9,8 @@ module.exports = {
 		const data = {version: options.version};
 		options.pre = options.pre || [];
 
+		const cb = typeof options.callback === 'function' ? options.callback : (data) => data;
+
 		if (!options.revisionFile) {
 			return done(data);
 		}
@@ -30,7 +32,7 @@ module.exports = {
 				config: {
 					auth: false,
 					handler() {
-						return data;
+						return cb(data);
 					},
 					pre: options.pre,
 					description: 'Show status',
