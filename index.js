@@ -35,8 +35,7 @@ module.exports = {
 						return cb(data);
 					},
 					pre: options.pre,
-					description: 'Show status',
-					tags: ['api']
+					description: 'Show status'
 				}
 			});
 		}
